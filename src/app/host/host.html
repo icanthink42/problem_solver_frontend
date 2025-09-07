@@ -1,0 +1,56 @@
+@if (gameState.state === 'disconnected') {
+  <div class="host-container">
+    <form class="host-form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <input
+          type="text"
+          [(ngModel)]="lobbyCode"
+          name="lobbyCode"
+          placeholder="Lobby Code"
+          required
+          [disabled]="isConnecting">
+      </div>
+
+      @if (error) {
+        <div class="error-message">{{ error }}</div>
+      }
+
+      <button type="submit" [disabled]="!lobbyCode || isConnecting">
+        @if (isConnecting) {
+          Creating...
+        } @else {
+          Create Lobby
+        }
+      </button>
+    </form>
+  </div>
+} @else {
+  <div class="host-container">
+    <h2>Lobby Code: {{ lobbyCode }}</h2>
+    <qrcode
+      [qrdata]="joinUrl"
+      [width]="256"
+      [errorCorrectionLevel]="'M'">
+    </qrcode>
+    <p>Scan to join or share this link:</p>
+    <div class="join-url">{{ joinUrl }}</div>
+
+    @if (gameState.state === 'waiting') {
+      <button class="start-question" (click)="startQuestion()">
+        Start Question
+      </button>
+    }
+
+    @if (gameState.state === 'question') {
+      <button class="end-question" (click)="endQuestion()">
+        End Question
+      </button>
+    }
+
+    @if (gameState.state === 'question_review') {
+      <button class="start-question" (click)="startQuestion()">
+        Next Question
+      </button>
+    }
+  </div>
+}
