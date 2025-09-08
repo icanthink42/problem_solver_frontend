@@ -6,17 +6,22 @@ import { PointSelectorQuestion } from '../shared/questions';
   standalone: true,
   template: `
     <div class="point-selector-container" #container>
-      <img [src]="question.image_url"
-           (load)="onImageLoad()"
-           (click)="onPointerEvent($event)"
-           (touchstart)="onPointerEvent($event)"
-           class="background-image">
-      @if (selectedPoint) {
-        <div class="point-marker"
-             [style.left.px]="selectedPoint.x - 5"
-             [style.top.px]="selectedPoint.y - 5">
+      <div class="image-container">
+        <img [src]="question.image_url"
+             (load)="onImageLoad()"
+             class="background-image"
+             #img>
+        <div class="click-overlay"
+             (click)="onPointerEvent($event)"
+             (touchstart)="onPointerEvent($event)">
         </div>
-      }
+        @if (selectedPoint) {
+          <div class="point-marker"
+               [style.left.px]="selectedPoint.x - 5"
+               [style.top.px]="selectedPoint.y - 5">
+          </div>
+        }
+      </div>
       <div class="coordinates">
         {{ question.x_comp }}: {{ selectedPoint?.x || '?' }},
         {{ question.y_comp }}: {{ selectedPoint?.y || '?' }}
@@ -27,21 +32,44 @@ import { PointSelectorQuestion } from '../shared/questions';
     .point-selector-container {
       position: relative;
       width: 100%;
-      height: 100vh;
+      height: calc(100vh - 150px);
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      gap: 1rem;
       background-color: #f5f5f5;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .image-container {
+      position: relative;
+      max-width: 100%;
+      max-height: calc(100vh - 250px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .background-image {
       max-width: 100%;
-      max-height: 80vh;
+      max-height: calc(100vh - 250px);
+      width: auto;
+      height: auto;
       object-fit: contain;
+      user-select: none;
+    }
+
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       cursor: crosshair;
-      touch-action: none; /* Prevent browser handling of touch events */
-      -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-      user-select: none; /* Prevent text selection */
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .point-marker {
@@ -54,9 +82,17 @@ import { PointSelectorQuestion } from '../shared/questions';
     }
 
     .coordinates {
-      margin-top: 1rem;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-family: monospace;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
     }
 
   `]
@@ -87,21 +123,23 @@ export class PointSelectorComponent implements AfterViewInit {
   }
 
   onPointerEvent(event: MouseEvent | TouchEvent) {
-    if (!this.imageRect) return;
+    const overlay = event.target as HTMLElement;
+    const rect = overlay.getBoundingClientRect();
 
-    // Prevent default behavior for touch events (zooming, scrolling)
+    let x: number, y: number;
+
     if (event.type === 'touchstart') {
       event.preventDefault();
       const touch = (event as TouchEvent).touches[0];
-      const x = touch.clientX - this.imageRect.left;
-      const y = touch.clientY - this.imageRect.top;
-      this.selectedPoint = { x, y };
+      x = touch.clientX - rect.left;
+      y = touch.clientY - rect.top;
     } else {
       const mouseEvent = event as MouseEvent;
-      const x = mouseEvent.clientX - this.imageRect.left;
-      const y = mouseEvent.clientY - this.imageRect.top;
-      this.selectedPoint = { x, y };
+      x = mouseEvent.offsetX;
+      y = mouseEvent.offsetY;
     }
+
+    this.selectedPoint = { x, y };
   }
 
   onSubmit() {

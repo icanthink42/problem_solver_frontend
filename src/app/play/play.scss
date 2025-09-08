@@ -1,3 +1,9 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .login-container, .question-container, .waiting-container, .finished-container {
   height: 100vh;
   display: flex;
@@ -6,7 +12,9 @@
   align-items: center;
   background-color: #f5f5f5;
   padding: 1rem;
-  margin: 0 auto;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .login-form {
@@ -78,9 +86,32 @@ button {
 
 .question-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   text-align: center;
-  margin: 0 auto;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 1rem;
+  overflow: hidden;
+
+  // When it contains a point selector, adjust layout
+  app-point-selector {
+    flex: 1;
+    min-height: 0; // Allow flex shrinking
+    display: block;
+    overflow: hidden;
+  }
+
+  .question-text {
+    flex-shrink: 0; // Prevent question text from shrinking
+  }
+
+  .submit-answer, .answer-submitted {
+    flex-shrink: 0; // Prevent button from shrinking
+    margin: 1rem auto;
+  }
 }
 
 .question-text {
