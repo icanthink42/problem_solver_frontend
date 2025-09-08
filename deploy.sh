@@ -10,7 +10,7 @@ EC2_USER="ec2-user"
 DIST_PATH="dist/problem-solver"
 
 echo "Building Angular app in production mode..."
-npm run build -- --configuration production
+npm run build -- --configuration production --optimization
 
 if [ $? -ne 0 ]; then
     echo "Build failed!"
