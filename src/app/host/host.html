@@ -28,8 +28,6 @@
   <div class="host-container">
     @if (gameState.state === 'question' || gameState.state === 'question_review') {
       <h2>{{ currentQuestionText }}</h2>
-    } @else {
-      <h2>Lobby Code: {{ lobbyCode }}</h2>
     }
     @if (currentQuestionImage) {
       <img [src]="currentQuestionImage" alt="Question Image" class="question-image">
