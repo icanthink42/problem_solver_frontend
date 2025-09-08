@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { WebSocketService } from '../shared/websocket.service';
@@ -137,6 +137,8 @@ export class PlayComponent implements OnInit, OnDestroy {
     }
   }
 
+  @ViewChild(PointSelectorComponent) pointSelector!: PointSelectorComponent;
+
   hasValidAnswer(): boolean {
     if (!this.currentQuestion) return false;
 
@@ -151,9 +153,7 @@ export class PlayComponent implements OnInit, OnDestroy {
         answer !== null && answer !== '' && !isNaN(Number(answer))
       );
     } else if (this.currentQuestion.type === 'point_selector') {
-      // Get reference to point selector component
-      const pointSelector = document.querySelector('app-point-selector') as any;
-      return pointSelector?.selectedPoint !== null;
+      return this.pointSelector?.selectedPoint !== null;
     }
     return false;
   }
@@ -163,15 +163,22 @@ export class PlayComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // For point selector, we use the coordinates directly
-    if (this.currentQuestion.type === 'point_selector' && pointCoordinates) {
-      const [x, y] = pointCoordinates;
-      const packet: SBAnswerPacket = {
-        type: 'answer',
-        answers: [x.toString(), y.toString()]
-      };
-      this.wsService.sendPacket(packet);
-      this.answerSubmitted = true;
+    // For point selector
+    if (this.currentQuestion.type === 'point_selector') {
+      if (pointCoordinates) {
+        // If coordinates were provided (from submit event), send them
+        const [x, y] = pointCoordinates;
+        const packet: SBAnswerPacket = {
+          type: 'answer',
+          answers: [x.toString(), y.toString()]
+        };
+        this.wsService.sendPacket(packet);
+        this.answerSubmitted = true;
+      } else {
+        // If no coordinates (from button click), trigger point selector submit
+        if (!this.pointSelector?.selectedPoint) return;
+        this.pointSelector.onSubmit();
+      }
       return;
     }
 
