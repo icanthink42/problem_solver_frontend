@@ -1,5 +1,3 @@
-declare const BACKEND: string;
-
 export const environment = {
-    backendUrl: typeof BACKEND !== 'undefined' ? BACKEND : 'http://localhost:8080'
+  backendUrl: 'ws://localhost:8080'
 };

@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class WebSocketService {
   private socket: WebSocket | null = null;
-  private readonly serverUrl = environment.backendUrl.replace('http', 'ws') + '/ws';
+  private readonly serverUrl = `${environment.backendUrl}/ws`;
 
   // Subject for received messages
   private messageReceived = new Subject<CBBasePacket>();
