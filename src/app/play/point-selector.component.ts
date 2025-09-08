@@ -22,10 +22,6 @@ import { PointSelectorQuestion } from '../shared/questions';
           </div>
         }
       </div>
-      <div class="coordinates">
-        {{ question.x_comp }}: {{ selectedPoint?.x || '?' }},
-        {{ question.y_comp }}: {{ selectedPoint?.y || '?' }}
-      </div>
     </div>
   `,
   styles: [`
@@ -81,19 +77,6 @@ import { PointSelectorQuestion } from '../shared/questions';
       pointer-events: none;
     }
 
-    .coordinates {
-      font-size: 1.1rem;
-      font-family: monospace;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: absolute;
-      bottom: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-    }
 
   `]
 })
