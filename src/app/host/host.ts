@@ -27,6 +27,7 @@ export class HostComponent implements OnInit, OnDestroy {
   error: string = '';
   joinUrl: string = '';
   currentQuestionImage: string | null = null;
+  currentQuestionText: string | null = null;
   private subscription: Subscription | null = null;
 
   constructor(
@@ -61,6 +62,7 @@ export class HostComponent implements OnInit, OnDestroy {
           } else if (packet.type === 'question') {
             const questionPacket = packet as CBQuestionPacket;
             this.currentQuestionImage = questionPacket.question.image_url || null;
+            this.currentQuestionText = questionPacket.question.question;
           }
         },
         (error) => {

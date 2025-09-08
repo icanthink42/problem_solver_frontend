@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { CBBasePacket, SBBasePacket } from './packets';
 import { GameStateService } from './game-state.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebSocketService {
   private socket: WebSocket | null = null;
-  private readonly serverUrl = 'ws://localhost:8080/ws';
+  private readonly serverUrl = environment.backendUrl.replace('http', 'ws') + '/ws';
 
   // Subject for received messages
   private messageReceived = new Subject<CBBasePacket>();
