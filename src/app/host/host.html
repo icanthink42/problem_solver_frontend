@@ -27,13 +27,17 @@
 } @else {
   <div class="host-container">
     <h2>Lobby Code: {{ lobbyCode }}</h2>
-    <qrcode
-      [qrdata]="joinUrl"
-      [width]="256"
-      [errorCorrectionLevel]="'M'">
-    </qrcode>
-    <p>Scan to join or share this link:</p>
-    <div class="join-url">{{ joinUrl }}</div>
+    @if (currentQuestionImage) {
+      <img [src]="currentQuestionImage" alt="Question Image" class="question-image">
+    } @else {
+      <qrcode
+        [qrdata]="joinUrl"
+        [width]="512"
+        [errorCorrectionLevel]="'M'">
+      </qrcode>
+      <p>Scan to join or share this link:</p>
+      <div class="join-url">{{ joinUrl }}</div>
+    }
 
     @if (gameState.state === 'waiting') {
       <button class="start-question" (click)="startQuestion()">

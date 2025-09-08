@@ -8,6 +8,7 @@ import {
   SBNextQuestionPacket,
   SBEndQuestionPacket,
   CBLoginResponse,
+  CBQuestionPacket,
   State,
   CBQuestionGradePacket
 } from '../shared/packets';
@@ -25,6 +26,7 @@ export class HostComponent implements OnInit, OnDestroy {
   isConnecting: boolean = false;
   error: string = '';
   joinUrl: string = '';
+  currentQuestionImage: string | null = null;
   private subscription: Subscription | null = null;
 
   constructor(
@@ -56,6 +58,9 @@ export class HostComponent implements OnInit, OnDestroy {
           } else if (packet.type === 'question_grade') {
             const gradePacket = packet as CBQuestionGradePacket;
             this.gameState.updateState(gradePacket.state);
+          } else if (packet.type === 'question') {
+            const questionPacket = packet as CBQuestionPacket;
+            this.currentQuestionImage = questionPacket.question.image_url || null;
           }
         },
         (error) => {
