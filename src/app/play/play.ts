@@ -15,14 +15,15 @@ import {
 } from '../shared/packets';
 import { Subscription } from 'rxjs';
 
-import { CurrentQuestion, MultipleChoiceQuestion, NumericalQuestion, isMultipleChoice, isNumerical } from '../shared/questions';
+import { CurrentQuestion, MultipleChoiceQuestion, NumericalQuestion, PointSelectorQuestion, isMultipleChoice, isNumerical, isPointSelector } from '../shared/questions';
+import { PointSelectorComponent } from './point-selector.component';
 
 @Component({
   selector: 'app-play',
   templateUrl: './play.html',
   styleUrls: ['./play.scss'],
   standalone: true,
-  imports: [FormsModule]
+  imports: [FormsModule, PointSelectorComponent]
 })
 export class PlayComponent implements OnInit, OnDestroy {
   name: string = '';
@@ -141,7 +142,7 @@ export class PlayComponent implements OnInit, OnDestroy {
 
     if (this.currentQuestion.type === 'multiple_choice') {
       return this.selectedOption !== null;
-    } else {
+    } else if (this.currentQuestion.type === 'numerical') {
       const numQuestion = this.currentQuestion.data as NumericalQuestion;
       if (this.numericalAnswers.length !== numQuestion.answers.length) {
         return false;
@@ -149,11 +150,33 @@ export class PlayComponent implements OnInit, OnDestroy {
       return this.numericalAnswers.every(answer =>
         answer !== null && answer !== '' && !isNaN(Number(answer))
       );
+    } else if (this.currentQuestion.type === 'point_selector') {
+      // Get reference to point selector component
+      const pointSelector = document.querySelector('app-point-selector') as any;
+      return pointSelector?.selectedPoint !== null;
     }
+    return false;
   }
 
-  submitAnswer() {
-    if (!this.hasValidAnswer() || !this.currentQuestion || this.answerSubmitted) {
+  submitAnswer(pointCoordinates?: [number, number]) {
+    if (!this.currentQuestion || this.answerSubmitted) {
+      return;
+    }
+
+    // For point selector, we use the coordinates directly
+    if (this.currentQuestion.type === 'point_selector' && pointCoordinates) {
+      const [x, y] = pointCoordinates;
+      const packet: SBAnswerPacket = {
+        type: 'answer',
+        answers: [x.toString(), y.toString()]
+      };
+      this.wsService.sendPacket(packet);
+      this.answerSubmitted = true;
+      return;
+    }
+
+    // For other question types, check if we have valid answers
+    if (!this.hasValidAnswer()) {
       return;
     }
 
@@ -174,12 +197,16 @@ export class PlayComponent implements OnInit, OnDestroy {
     return parseInt(index ?? '0');
   }
 
-  isMultipleChoice(question: MultipleChoiceQuestion | NumericalQuestion): question is MultipleChoiceQuestion {
+  isMultipleChoice(question: any): question is MultipleChoiceQuestion {
     return isMultipleChoice(question);
   }
 
-  isNumerical(question: MultipleChoiceQuestion | NumericalQuestion): question is NumericalQuestion {
+  isNumerical(question: any): question is NumericalQuestion {
     return isNumerical(question);
+  }
+
+  isPointSelector(question: any): question is PointSelectorQuestion {
+    return isPointSelector(question);
   }
 
   ngOnDestroy() {

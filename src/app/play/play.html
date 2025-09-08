@@ -44,7 +44,12 @@
       {{ currentQuestion.data.question }}
     </div>
 
-    @if (isMultipleChoice(currentQuestion.data)) {
+    @if (isPointSelector(currentQuestion.data)) {
+      <app-point-selector
+        [question]="currentQuestion.data"
+        (submit)="submitAnswer($event)">
+      </app-point-selector>
+    } @else if (isMultipleChoice(currentQuestion.data)) {
       <div class="options-container">
         @for (option of currentQuestion.data.options; track option; let i = $index) {
           <button

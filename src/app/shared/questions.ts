@@ -17,15 +17,30 @@ export interface NumericalQuestion extends BaseQuestion {
   type: 'int' | 'float';
 }
 
+export interface PointSelectorQuestion extends BaseQuestion {
+  image_url: string;  // Required for point selector
+  x_comp: string;     // Label for x component
+  y_comp: string;     // Label for y component
+}
+
+export type QuestionData = MultipleChoiceQuestion | NumericalQuestion | PointSelectorQuestion;
+
 export interface CurrentQuestion {
-  data: MultipleChoiceQuestion | NumericalQuestion;
-  type: 'multiple_choice' | 'numerical';
+  data: QuestionData;
+  type: 'multiple_choice' | 'numerical' | 'point_selector';
 }
 
-export function isMultipleChoice(question: MultipleChoiceQuestion | NumericalQuestion): question is MultipleChoiceQuestion {
-  return 'options' in question;
+// Type guard for multiple choice questions
+export function isMultipleChoice(question: QuestionData): question is MultipleChoiceQuestion {
+  return 'options' in question && !('answers' in question) && !('x_comp' in question);
 }
 
-export function isNumerical(question: MultipleChoiceQuestion | NumericalQuestion): question is NumericalQuestion {
-  return 'answers' in question;
+// Type guard for numerical questions
+export function isNumerical(question: QuestionData): question is NumericalQuestion {
+  return 'answers' in question && !('options' in question) && !('x_comp' in question);
+}
+
+// Type guard for point selector questions
+export function isPointSelector(question: QuestionData): question is PointSelectorQuestion {
+  return 'x_comp' in question && !('options' in question) && !('answers' in question);
 }
